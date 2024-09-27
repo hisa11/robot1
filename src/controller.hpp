@@ -20,13 +20,16 @@ extern int AIblue;
 extern int syudouAI;
 extern bool AIchenge;
 extern bool syudouAIchenge;
+extern bool hanten;
 
 extern const uint32_t penguinID;
 
 extern CAN can;
 extern CAN can2;
+extern BufferedSerial neopixcel;
 
 extern FirstPenguin penguin;
+extern FirstPenguin penguin_ball;
 
 void processInput(char *output_buf);
 

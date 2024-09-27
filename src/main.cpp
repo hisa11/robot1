@@ -12,13 +12,19 @@ extern int AIred;
 extern int AIblue;
 extern int syudouAI;
 extern bool AIchenge;
+extern bool syudouAIchenge;
 extern FirstPenguin penguin; // FirstPenguinクラスのインスタンス
+extern FirstPenguin penguin_ball;
 int16_t output;
+int AIoutput;
+
+DigitalIn color(PA_0);
 
 CANMessage msg0;
 CANMessage msg1;
 
 BufferedSerial pc(USBTX, USBRX, 250000); // Serial communication with the PC
+BufferedSerial neopixcel(PB_6, PA_10, 9600);  // Serial communication with the PC
 // CAN can1(PA_11, PA_12, (int)1e6);
 CAN can1(PA_11, PA_12, (int)1e6);
 CAN can2(PB_12, PB_13, (int)1e6);
@@ -56,6 +62,7 @@ void readUntilPipe(char *output_buf, int output_buf_size)
 
 void CANSend()
 {
+    color.mode(PullDown);
     while (1)
     {
         output = lefts;
@@ -82,23 +89,40 @@ void CANSend()
 
         if (AIchenge == 0)
         {
-            penguin.pwm[0] = -leftJoystickX * 0.2 - leftJoystickY * 0.2 - rightJoystickX;
-            penguin.pwm[1] = leftJoystickX * 0.2 - leftJoystickY * 0.2 - rightJoystickX;
-            penguin.pwm[2] = leftJoystickX * 0.2 + leftJoystickY * 0.2 - rightJoystickX;
-            penguin.pwm[3] = leftJoystickY * 0.2 - leftJoystickX * 0.2 - rightJoystickX;
+            penguin.pwm[0] = -leftJoystickX * 0.4 - leftJoystickY * 0.4 - rightJoystickX;
+            penguin.pwm[1] = leftJoystickX * 0.4 - leftJoystickY * 0.4 - rightJoystickX;
+            penguin.pwm[2] = leftJoystickX * 0.4 + leftJoystickY * 0.4 - rightJoystickX;
+            penguin.pwm[3] = leftJoystickY * 0.4 - leftJoystickX * 0.4 - rightJoystickX;
+            if(hanten == 1)
+            {
+                penguin.pwm[0] = -penguin.pwm[0];
+                penguin.pwm[1] = -penguin.pwm[1];
+                penguin.pwm[2] = -penguin.pwm[2];
+                penguin.pwm[3] = -penguin.pwm[3];
+            }
         }
         else
         {
             if (syudouAIchenge == 0)
             {
-                penguin.pwm[0] = -(320 - AIred) * 2;
-                penguin.pwm[1] = (320 - AIred) * 2;
-                penguin.pwm[2] = -(320 - AIred) * 2;
-                penguin.pwm[3] = -(320 - AIred) * 2;
-            }else{
+                if(color.read() == 1)
+                {
+                    AIoutput = AIred;
+
+                }else{
+                    AIoutput = AIblue;
+                }
+                printf("AIoutput = %d\n", AIoutput);
+                penguin.pwm[0] = (320 - AIoutput) * 30;
+                penguin.pwm[1] = -(320 - AIoutput) * 30;
+                penguin.pwm[2] = -(320 - AIoutput) * 30;
+                penguin.pwm[3] = (320 - AIoutput) * 30;
+            }
+            else
+            {
                 penguin.pwm[0] = -syudouAI;
                 penguin.pwm[1] = syudouAI;
-                penguin.pwm[2] = -syudouAI;
+                penguin.pwm[2] = syudouAI;
                 penguin.pwm[3] = -syudouAI;
             }
         }
@@ -111,17 +135,21 @@ void CANSend()
             penguin.pwm[2] = maxspeed;
         if (penguin.pwm[3] > maxspeed)
             penguin.pwm[3] = maxspeed;
-        printf("penguin.pwm[0] = %d, penguin.pwm[1] = %d, penguin.pwm[2] = %d, penguin.pwm[3] = %d\n", penguin.pwm[0], penguin.pwm[1], penguin.pwm[2], penguin.pwm[3]);
+        // printf("penguin.pwm[0] = %d, penguin.pwm[1] = %d, penguin.pwm[2] = %d, penguin.pwm[3] = %d\n", penguin.pwm[0], penguin.pwm[1], penguin.pwm[2], penguin.pwm[3]);
 
         can1.write(msg0);
         can1.write(msg1);
         penguin.send();
+        penguin_ball.send();
         ThisThread::sleep_for(10ms);
+    // neopixcel.write("blue\n", 6);
+    // printf("red\n");
     }
 }
 
 int main()
 {
+    // printf("aaa\n");
     Thread thread1;         // Threadインスタンスの宣言
     thread1.start(CANSend); // thread1をCANSend関数で開始
     while (1)
