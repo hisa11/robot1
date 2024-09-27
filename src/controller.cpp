@@ -55,6 +55,15 @@ void processInput(char *output_buf)
         neopixcel.write("hanten\n", 6);
         printf("hanten\n");
     }
+    else if (strncmp(output_buf, "blue: nothing", 13) == 0)
+    {
+        AIblue = 320;
+    }
+    else if (strncmp(output_buf, "red: nothing", 12) == 0)
+    {
+        AIred = 320;
+    }
+
     else if (strncmp(output_buf, "red: ", 5) == 0)
     {
         char *dataPointer = output_buf + 5;
@@ -82,7 +91,8 @@ void processInput(char *output_buf)
     //     // penguin.pwm[3] = 0;
     //     // penguin.send();
     // }
-    else if (strncmp(output_buf, "R1ON", 4) == 0) // "R1ON"という文字列で始まるかどうかを確認します
+
+    else if (strncmp(output_buf, "circle", 6) == 0) // "circle"という文字列で始まるかどうかを確認します
     {
         if (ball == 0)
         {
@@ -95,53 +105,25 @@ void processInput(char *output_buf)
             penguin_ball.pwm[0] = 0;
         }
     }
-    else if (strncmp(output_buf, "cross", 5) == 0)
+
+    else if (strncmp(output_buf, "L1ON", 4) == 0)
     {
         lefts = 16380;
     }
-    else if (strncmp(output_buf, "triangle", 8) == 0)
+    else if (strncmp(output_buf, "L1OFF", 5) == 0)
     {
         lefts = 0;
     }
-    else if (strncmp(output_buf, "circle", 6) == 0)
+    else if (strncmp(output_buf, "R1ON", 4) == 0)
     {
         rigts = -16380;
     }
-    else if (strncmp(output_buf, "square", 6) == 0)
+    else if (strncmp(output_buf, "R1OFF", 5) == 0)
     {
         rigts = 0;
     }
-    else if (strncmp(output_buf, "L2ON", 4) == 0)
-    {
-    }
-    else if (strncmp(output_buf, "L2OFF", 5) == 0)
-    {
-    }
-    else if (strncmp(output_buf, "R2ON", 4) == 0)
-    {
-    }
-    else if (strncmp(output_buf, "R2OFF", 5) == 0)
-    {
-    }
-    else if (strncmp(output_buf, "select", 6) == 0)
-    {
-    }
-    else if (strncmp(output_buf, "start", 5) == 0)
-    {
-    }
-    else if (strncmp(output_buf, "select", 6) == 0)
-    {
-    }
-    else if (strncmp(output_buf, "start", 5) == 0)
-    {
-    }
-    else if (strncmp(output_buf, "go", 2) == 0)
-    {
-    }
-    else if (strncmp(output_buf, "back", 4) == 0)
-    {
-    }
-    else if (strncmp(output_buf, "L1ON", 6) == 0)
+
+    else if (strncmp(output_buf, "square", 6) == 0)
     {
         if (AIchenge == 0)
         {
@@ -165,20 +147,39 @@ void processInput(char *output_buf)
             }
         }
     }
-    else if (strncasecmp(output_buf, "nothing", 7) == 0)
-    {
-        AIred = 320;
-        AIblue = 320;
-        // printf("AIred = %d, AIblue = %d\n", AIred, AIblue);
-    }
+
     else if (strncasecmp(output_buf, "nari", 4) == 0)
     {
-        neopixcel.write("blue\n", 5);
+        AIchenge = 0;
+        if (user == 1)
+        {
+            neopixcel.write("blue\n", 5);
+        }
+        else if (user == 2)
+        {
+            neopixcel.write("white\n", 6);
+        }
+        else
+        {
+            neopixcel.write("purple\n", 6);
+        }
         user = 1;
     }
     else if (strncasecmp(output_buf, "iseki", 5) == 0)
     {
-        neopixcel.write("white\n", 5);
+        AIchenge = 0;
+        if (user == 1)
+        {
+            neopixcel.write("blue\n", 5);
+        }
+        else if (user == 2)
+        {
+            neopixcel.write("white\n", 6);
+        }
+        else
+        {
+            neopixcel.write("purple\n", 6);
+        }
         user = 2;
     }
     else if (strncasecmp(output_buf, "finish", 6) == 0)
